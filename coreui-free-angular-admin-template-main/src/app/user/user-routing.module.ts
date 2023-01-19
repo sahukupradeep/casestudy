@@ -10,15 +10,7 @@ import { UpdateComponent } from './update/update.component';
 const routes: Routes = [
   {
     path: '',
-    data: {
-      title: 'User'
-    },
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'search'
-      },
       {
         path: 'search',
         component: SearchComponent,

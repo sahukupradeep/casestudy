@@ -1,41 +1,18 @@
 package com.user.payload.response;
 
-public class UserResponse {
-
-	private Long id;
+public class SearchUserResponse {
 
 	private String userName;
-
 	private String firstName;
-
 	private String lastName;
-
-	private String email;
-
-	private String phone;
-
-	private String dob;
-
 	private String address;
 
-	public UserResponse() {
-		super();
-	}
-
-	public UserResponse(String userName, String firstName,String lastName,String address) {
+	public SearchUserResponse(String userName, String firstName, String lastName, String address) {
 		super();
 		this.userName = userName;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.address = address;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getUserName() {
@@ -60,30 +37,6 @@ public class UserResponse {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getDob() {
-		return dob;
-	}
-
-	public void setDob(String dob) {
-		this.dob = dob;
 	}
 
 	public String getAddress() {

@@ -1,6 +1,7 @@
 package com.user.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -12,10 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.user.constant.AppConstant;
-import com.user.entity.Audit;
 import com.user.entity.User;
 import com.user.payload.request.SignReq;
+import com.user.payload.request.TempPswRequest;
+import com.user.payload.request.UpdatePswReq;
 import com.user.payload.response.MessageResponse;
+import com.user.payload.response.SearchUserResponse;
 import com.user.payload.response.UserResponse;
 import com.user.repository.UserRepository;
 import com.user.util.EncryptDecryptUtil;
@@ -76,8 +79,8 @@ public class UserService {
 			logger.info("User registered successfully!");
 			return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("User registered successfullY!"));
 		} catch (Exception e) {
-			
-			logger.error("registerUser() : Exception occured, message={}",e.getMessage(),e);
+
+			logger.error("registerUser() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, e.getLocalizedMessage());
 			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
 		}
@@ -109,9 +112,9 @@ public class UserService {
 
 	}
 
-	public ResponseEntity<MessageResponse> changePsw(User user) {
+	public ResponseEntity<MessageResponse> changePsw(UpdatePswReq user) {
 
-		logger.info("change password");
+		logger.info("change password ");
 
 		try {
 			Optional<User> optional = userRepository.findByUserName(user.getUserName());
@@ -124,17 +127,15 @@ public class UserService {
 
 			User existUser = optional.get();
 
-			if (user.getPassword().equals(existUser.getPassword())) {
-				logger.error("Error: Oldpassword and newpassword are same!");
+			if (!encryptDecryptUtil.encrypt(user.getPassword()).equals(existUser.getPassword())) {
+				logger.error("Error: Wrong old password!");
 
-				this.runAudit(user.getUserName(), AppConstant.CHANGE_PSW_ACT,
-						"Error: Oldpassword and newpassword are same!");
+				this.runAudit(user.getUserName(), AppConstant.CHANGE_PSW_ACT, "Error: Wrong old password!");
 
-				return ResponseEntity.badRequest()
-						.body(new MessageResponse("Error: Oldpassword and newpassword are same!"));
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: Wrong old password!"));
 			}
 
-			existUser.setPassword(encryptDecryptUtil.encrypt(user.getPassword()));
+			existUser.setPassword(encryptDecryptUtil.encrypt(user.getNewPassword()));
 			existUser.setUpdatedDate(LocalDateTime.now());
 
 			userRepository.save(existUser);
@@ -163,7 +164,6 @@ public class UserService {
 			}
 
 			user.setEmail(encryptDecryptUtil.encrypt(user.getEmail()));
-			user.setPassword(encryptDecryptUtil.encrypt(user.getPassword()));
 			user.setPhone(encryptDecryptUtil.encrypt(user.getPhone()));
 			user.setDob(encryptDecryptUtil.encrypt(user.getDob()));
 
@@ -221,7 +221,6 @@ public class UserService {
 
 				User user = optional.get();
 
-
 				String mail = encryptDecryptUtil.decrypt(user.getEmail());
 				String phone = encryptDecryptUtil.decrypt(user.getPhone());
 				String dob = encryptDecryptUtil.decrypt(user.getDob());
@@ -245,14 +244,43 @@ public class UserService {
 
 	}
 
-
 	private void runAudit(String userName, String activity, String msg) {
 
 		Thread auditThread = new Thread(() -> {
-			this.auditService.addAudit(userName, activity, msg);
+			auditService.addAudit(userName, activity, msg);
 		});
 		auditThread.start();
 
+	}
+
+	public List<SearchUserResponse> search(String userName, String firstName, String lastName, String dob) {
+		logger.info(" search ");
+
+		List<SearchUserResponse> users = userRepository.search(userName, firstName, lastName,
+				encryptDecryptUtil.encrypt(dob));
+		return users;
+	}
+
+	public ResponseEntity<MessageResponse> sendTempPsw(TempPswRequest userReq) {
+		logger.info("send temp password");
+
+		Optional<User> optional = userRepository.findByUserNameAndEmailAndPhoneAndDob(userReq.getUserName(),
+				encryptDecryptUtil.encrypt(userReq.getEmail()), encryptDecryptUtil.encrypt(userReq.getPhone()),
+				encryptDecryptUtil.encrypt(userReq.getDob()));
+		if(optional.isEmpty()) {
+			logger.error("Error: bad request!");
+			this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, "Error: bad request!");
+			return ResponseEntity.badRequest().body(new MessageResponse("Error: bad request!"));
+		}
+		String password="temp@1346";
+		User existUser=optional.get();
+		existUser.setPassword(encryptDecryptUtil.encrypt(password));
+		existUser.setPswType(AppConstant.TEMP_PSW);
+		
+		userRepository.save(existUser);
+		logger.info("Send temparay password successfully!");
+		this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, "Error: bad request!");
+		return ResponseEntity.ok(new MessageResponse("Send temparay password successfully! password is : "+password));
 	}
 
 }

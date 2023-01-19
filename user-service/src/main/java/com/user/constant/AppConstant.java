@@ -4,6 +4,7 @@ public class AppConstant {
 
 	public static final Integer STATUS_ACTIVE = 1;
 	public static final Integer VALID_PSW = 1;
+	public static final Integer TEMP_PSW = 2;
 	
 	public static final String SUCCESS_MSG="Success";
 	public static final String FAIL_MSG="fail";

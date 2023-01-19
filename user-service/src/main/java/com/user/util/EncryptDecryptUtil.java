@@ -41,7 +41,7 @@ public class EncryptDecryptUtil {
 			byte[] encryptedText = cipher.doFinal(plainText);
 			encryptedString = new String(Base64.encodeBase64(encryptedText));
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return encryptedString;
 	}
@@ -54,7 +54,7 @@ public class EncryptDecryptUtil {
 			byte[] plainText = cipher.doFinal(encryptedText);
 			decryptedText = new String(plainText);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace()
 		}
 		return decryptedText;
 	}

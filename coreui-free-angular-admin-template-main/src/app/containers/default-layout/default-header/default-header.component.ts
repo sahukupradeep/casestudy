@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ClassToggleService, HeaderComponent } from '@coreui/angular';

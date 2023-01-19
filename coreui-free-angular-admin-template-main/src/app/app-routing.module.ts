@@ -11,15 +11,12 @@ import { ViewComponent } from './views/pages/view/view.component';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
+    redirectTo: 'dashboard',
     pathMatch: 'full'
   },
   {
     path: '',
     component: DefaultLayoutComponent,
-    data: {
-      title: 'Home'
-    },
     children: [
       {
         path: 'dashboard',
