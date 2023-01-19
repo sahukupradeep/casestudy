@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Built-By: PRADEEP
+Build-Jdk: 17.0.4
+Implementation-Title: SpringBootUploadDownloadExcelFile
+Implementation-Version: 0.0.1
+Implementation-Vendor-Id: com.grokonez.excelfile
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-boot
+ -starter-parent/SpringBootUploadDownloadExcelFile
+Created-By: Maven Integration for Eclipse
+
