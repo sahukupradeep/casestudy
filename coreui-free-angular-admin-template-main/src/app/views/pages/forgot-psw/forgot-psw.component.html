@@ -5,24 +5,44 @@
         <c-card-group>
           <c-card>
             <c-card-body>
-              <div>
+              <div *ngIf="!isSuccess">
                 <form cForm [formGroup]="tempPswForm">
                   <h2 class="text-center">Send Tamporary Password</h2>
                   <div class="form-group mb-4">
                     <label class="form-label">User Name</label>
-                    <input type="text" class="form-control" formControlName="userName"/>
+                    <input type="text" class="form-control" formControlName="userName"
+                      [ngClass]="{ 'is-invalid': submitted && f['userName'].errors }" />
+
+                    <div *ngIf="submitted && f['userName'].errors" class="invalid-feedback">
+                      <div *ngIf="f['userName'].errors['required']">User Name is required</div>
+                    </div>
                   </div>
                   <div class="form-group mb-4">
                     <label class="form-label">Email</label>
-                    <input type="text" class="form-control" formControlName="email" />
+                    <input type="text" class="form-control" formControlName="email"
+                      [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" />
+
+                    <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+                      <div *ngIf="f['email'].errors['required']">Email is required</div>
+                    </div>
                   </div>
                   <div class="form-group mb-4">
                     <label class="form-label">Phone</label>
-                    <input type="text" class="form-control" formControlName="phone"/>
+                    <input type="text" class="form-control" formControlName="phone"
+                      [ngClass]="{ 'is-invalid': submitted && f['phone'].errors }" />
+
+                    <div *ngIf="submitted && f['phone'].errors" class="invalid-feedback">
+                      <div *ngIf="f['phone'].errors['required']">Phone is required</div>
+                    </div>
                   </div>
                   <div class="form-group mb-4">
                     <label class="form-label">DOB</label>
-                    <input type="date" class="form-control" formControlName="dob"/>
+                    <input type="date" class="form-control" formControlName="dob"
+                      [ngClass]="{ 'is-invalid': submitted && f['dob'].errors }" />
+
+                    <div *ngIf="submitted && f['dob'].errors" class="invalid-feedback">
+                      <div *ngIf="f['dob'].errors['required']">DOB is required</div>
+                    </div>
                   </div>
                   <button cButton class="btn-success mt-3 text-center" color="primary" (click)="sendTempPsw()">
                     Send
@@ -31,6 +51,15 @@
                     back
                   </button>
                 </form>
+              </div>
+              <div *ngIf="isSuccess" class="text-white bg-primary">
+
+                {{succMsg.message}}
+                <div>
+                  <button cButton class="btn-primary mt-3 text-center ml-3" color="success" routerLink="/login">
+                    login
+                  </button>
+                </div>
               </div>
             </c-card-body>
           </c-card>

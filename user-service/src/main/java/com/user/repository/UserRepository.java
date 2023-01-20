@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByUserNameAndPassword(String userName, String password);
 
-	@Query("SELECT new com.user.payload.response.SearchUserResponse(u.userName,u.firstName,u.lastName,u.address) FROM User u WHERE (:userName is null or u.userName = :userName) and "
+	@Query("SELECT new com.user.payload.response.SearchUserResponse(u.userName,u.firstName,u.lastName,u.address) FROM User u WHERE u.roleId IS NULL and (:userName is null or u.userName = :userName) and "
 			+ "(:firstName is null or u.firstName=:firstName) and (:lastName is null or u.lastName=:lastName) and "
 			+ "(:dob is null or u.dob=:dob)")
 	List<SearchUserResponse> search(@Param("userName") String userName, @Param("firstName") String firstName,

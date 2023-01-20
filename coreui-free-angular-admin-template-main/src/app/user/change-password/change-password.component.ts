@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -17,6 +17,7 @@ export class ChangePasswordComponent implements OnInit {
 
   errorMsg = ''
   isError = false;
+  submitted = false;
 
   constructor(
     private router: Router,
@@ -38,7 +39,16 @@ export class ChangePasswordComponent implements OnInit {
       rePassword: [null, [Validators.required]],
     });
   }
+
+  get f(): { [key: string]: AbstractControl } {
+    return this.pswForm.controls;
+  }
+
   changePassword(): void {
+    this.submitted = true;
+    if (this.pswForm.invalid) {
+      return;
+    }
     let value = this.pswForm.value;
     value.userName = this.userName;
     if (value.newPassword != value.rePassword) {
@@ -55,6 +65,8 @@ export class ChangePasswordComponent implements OnInit {
       data => {
         console.log("success");
         console.log(data)
+        // this.authService.isTemp = false;
+        this.logout()
       },
       err => {
         console.log("error");
@@ -64,5 +76,11 @@ export class ChangePasswordComponent implements OnInit {
 
       }
     );
+  }
+
+  private logout() {
+    this.authService.logout().subscribe((data) => {
+      this.router.navigate(['/login']);
+    });
   }
 }

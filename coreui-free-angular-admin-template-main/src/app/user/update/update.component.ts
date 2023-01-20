@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -14,6 +14,7 @@ export class UpdateComponent implements OnInit {
   public updateForm!: FormGroup;
 
   public userName:any;
+  submitted=false;
 
   constructor(
     private router: Router,
@@ -39,11 +40,14 @@ export class UpdateComponent implements OnInit {
       address: [null, [Validators.required]],
     });
   }
+  get f(): { [key: string]: AbstractControl } {
+    return this.updateForm.controls;
+  }
   private loadUser(){
     this.userService.getUser(this.userName).subscribe(
       data => {
         console.log("success");
-        console.log(data)
+        //console.log(data)
        // this.updateForm.value.userName=data.userName;
        this.updateForm.controls['userName'].setValue(data.userName);
        this.updateForm.controls['firstName'].setValue(data.firstName);
@@ -66,11 +70,15 @@ export class UpdateComponent implements OnInit {
   };
 
   updateUser():void{
-    console.log(this.updateForm.value)
+    this.submitted = true;
+    if (this.updateForm.invalid) {
+      return;
+    }
+    //console.log(this.updateForm.value)
     this.userService.updateUser(this.updateForm.value).subscribe(
       data => {
         console.log("success");
-        console.log(data)  
+        //console.log(data)  
         this.router.navigate(['/dashboard']);      
       },
       err => {

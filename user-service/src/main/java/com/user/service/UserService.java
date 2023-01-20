@@ -98,14 +98,16 @@ public class UserService {
 			if (optional.isPresent()) {
 				logger.info("User login successfullY!");
 				this.runAudit(user.getUserName(), AppConstant.LOGIN_ACT, AppConstant.SUCCESS_MSG);
-				return ResponseEntity.ok(new MessageResponse("User login successfullY!"));
+				return ResponseEntity
+						.ok(new MessageResponse(optional.get().getPswType() == AppConstant.TEMP_PSW ? "TEMP" : ""));
 			}
 			logger.warn("Invalid username and password");
 			this.runAudit(user.getUserName(), AppConstant.LOGIN_ACT, "Invalid username and password");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body(new MessageResponse("Invalid username and password"));
 		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage());
+
+			logger.error("signin() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(user.getUserName(), AppConstant.LOGIN_ACT, e.getLocalizedMessage());
 			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
 		}
@@ -136,6 +138,7 @@ public class UserService {
 			}
 
 			existUser.setPassword(encryptDecryptUtil.encrypt(user.getNewPassword()));
+			existUser.setPswType(AppConstant.VALID_PSW);
 			existUser.setUpdatedDate(LocalDateTime.now());
 
 			userRepository.save(existUser);
@@ -145,7 +148,7 @@ public class UserService {
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(new MessageResponse("Password changed successfullY!"));
 		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage());
+			logger.error("changePsw() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, e.getLocalizedMessage());
 			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
 		}
@@ -171,6 +174,7 @@ public class UserService {
 			user.setPassword(existUser.get().getPassword());
 			user.setRoleId(existUser.get().getRoleId());
 			user.setCreatedDate(existUser.get().getCreatedDate());
+			user.setStatus(existUser.get().getStatus());
 			user.setUpdatedDate(LocalDateTime.now());
 
 			userRepository.save(user);
@@ -178,7 +182,7 @@ public class UserService {
 			this.runAudit(user.getUserName(), AppConstant.UPDATE_ACT, AppConstant.UPDATE_ACT);
 			return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("User update successfullY!"));
 		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage());
+			logger.error("updateProfile() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(user.getUserName(), AppConstant.UPDATE_ACT, e.getLocalizedMessage());
 			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
 		}
@@ -207,6 +211,7 @@ public class UserService {
 			this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.FAIL_MSG);
 			return null;
 		} catch (Exception e) {
+			logger.error("getByUserName() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(userName, AppConstant.FATCH_ACT, e.getLocalizedMessage());
 			return null;
 		}
@@ -238,10 +243,57 @@ public class UserService {
 			this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.FAIL_MSG);
 			return null;
 		} catch (Exception e) {
+			logger.error("getProfileByUserName() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(userName, AppConstant.FATCH_ACT, e.getLocalizedMessage());
 			return null;
 		}
 
+	}
+
+	public List<SearchUserResponse> search(String userName, String firstName, String lastName, String dob) {
+		logger.info(" search ");
+		try {
+			List<SearchUserResponse> users = userRepository.search(userName, firstName, lastName,
+					encryptDecryptUtil.encrypt(dob));
+			this.runAudit("admin", AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
+			if(users==null || users.isEmpty()) {
+				return null;
+			}
+			return users;
+		}catch (Exception e) {
+			logger.error("search() : Exception occured, message={}", e.getMessage(), e);
+			this.runAudit("admin", AppConstant.FATCH_ACT, e.getLocalizedMessage());
+			return null;
+		}
+		
+	}
+
+	public ResponseEntity<MessageResponse> sendTempPsw(TempPswRequest userReq) {
+		logger.info("send temp password");
+		try {
+			Optional<User> optional = userRepository.findByUserNameAndEmailAndPhoneAndDob(userReq.getUserName(),
+					encryptDecryptUtil.encrypt(userReq.getEmail()), encryptDecryptUtil.encrypt(userReq.getPhone()),
+					encryptDecryptUtil.encrypt(userReq.getDob()));
+			if (optional.isEmpty()) {
+				logger.error("Error: bad request!");
+				this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, "Error: bad request!");
+				return ResponseEntity.badRequest().body(new MessageResponse("Error: bad request!"));
+			}
+			String password = "temp@1346";
+			User existUser = optional.get();
+			existUser.setPassword(encryptDecryptUtil.encrypt(password));
+			existUser.setPswType(AppConstant.TEMP_PSW);
+
+			userRepository.save(existUser);
+			logger.info("Send temparay password successfully!");
+			this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, AppConstant.SUCCESS_MSG);
+			return ResponseEntity
+					.ok(new MessageResponse("Send temparay password successfully! password is : " + password));
+		} catch (Exception e) {
+			logger.error("sendTempPsw() : Exception occured, message={}", e.getMessage(), e);
+			this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, e.getLocalizedMessage());
+			return ResponseEntity.ok(new MessageResponse(e.getLocalizedMessage()));
+		}
 	}
 
 	private void runAudit(String userName, String activity, String msg) {
@@ -251,36 +303,6 @@ public class UserService {
 		});
 		auditThread.start();
 
-	}
-
-	public List<SearchUserResponse> search(String userName, String firstName, String lastName, String dob) {
-		logger.info(" search ");
-
-		List<SearchUserResponse> users = userRepository.search(userName, firstName, lastName,
-				encryptDecryptUtil.encrypt(dob));
-		return users;
-	}
-
-	public ResponseEntity<MessageResponse> sendTempPsw(TempPswRequest userReq) {
-		logger.info("send temp password");
-
-		Optional<User> optional = userRepository.findByUserNameAndEmailAndPhoneAndDob(userReq.getUserName(),
-				encryptDecryptUtil.encrypt(userReq.getEmail()), encryptDecryptUtil.encrypt(userReq.getPhone()),
-				encryptDecryptUtil.encrypt(userReq.getDob()));
-		if(optional.isEmpty()) {
-			logger.error("Error: bad request!");
-			this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, "Error: bad request!");
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: bad request!"));
-		}
-		String password="temp@1346";
-		User existUser=optional.get();
-		existUser.setPassword(encryptDecryptUtil.encrypt(password));
-		existUser.setPswType(AppConstant.TEMP_PSW);
-		
-		userRepository.save(existUser);
-		logger.info("Send temparay password successfully!");
-		this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, "Error: bad request!");
-		return ResponseEntity.ok(new MessageResponse("Send temparay password successfully! password is : "+password));
 	}
 
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
 
@@ -12,8 +12,9 @@ export class RegisterComponent implements OnInit {
 
   public regForm!: FormGroup;
 
-  errorMsg=''
-  isReg=true;
+  errorMsg = ''
+  isReg = true;
+  submitted=false;
 
   constructor(
     private router: Router,
@@ -38,21 +39,28 @@ export class RegisterComponent implements OnInit {
       address: [null, [Validators.required]],
     });
   }
+  get f(): { [key: string]: AbstractControl } {
+    return this.regForm.controls;
+  }
 
   registerUser(): void {
-    console.log(this.regForm.value)
+    this.submitted = true;
+    if (this.regForm.invalid) {
+      return;
+    }
+    //console.log(this.regForm.value)
     this.userService.registerUser(this.regForm.value).subscribe(
       data => {
-        this.isReg=true;
+        this.isReg = true;
         console.log("success");
         console.log(data)
         this.router.navigate(['/login']);
       },
       err => {
-        this.isReg=false;
+        this.isReg = false;
         console.log("error");
         console.log(err.error)
-        this.errorMsg=err.error.message;
+        this.errorMsg = err.error.message;
 
       }
     );

@@ -1,41 +1,82 @@
 <c-container>
   <c-row class="justify-content-center">
     <c-col lg="7" md="9" xl="6">
-      <c-card class="mx-4">
+      <c-card class="mx-4" *ngIf="!isReg">
         <c-card-body class="p-4">
           <form cForm [formGroup]="regForm">
             <h2 class="text-center">ADD</h2>
             <div class="form-group">
               <label class="form-label">User Name</label>
-              <input type="text" class="form-control" name="userName" formControlName="userName" />
+              <input type="text" class="form-control" formControlName="userName"
+                [ngClass]="{ 'is-invalid': submitted && f['userName'].errors }" />
+
+              <div *ngIf="submitted && f['userName'].errors" class="invalid-feedback">
+                <div *ngIf="f['userName'].errors['required']">User Name is required</div>
+              </div>
+
             </div>
             <div class="form-group">
               <label class="form-label">First Name</label>
-              <input type="text" class="form-control" name="firstName" formControlName="firstName" />
+              <input type="text" class="form-control" formControlName="firstName"
+                [ngClass]="{ 'is-invalid': submitted && f['firstName'].errors }" />
+                
+              <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback">
+                <div *ngIf="f['firstName'].errors['required']">First Name is required</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Last Name</label>
-              <input type="text" class="form-control" name="lastName" formControlName="lastName" />
+              <input type="text" class="form-control" formControlName="lastName"
+                [ngClass]="{ 'is-invalid': submitted && f['lastName'].errors }" />
+
+              <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback">
+                <div *ngIf="f['lastName'].errors['required']">Last Name is required</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Email</label>
-              <input type="text" class="form-control" name="email" formControlName="email" />
+              <input type="text" class="form-control" formControlName="email"
+                [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" />
+
+              <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+                <div *ngIf="f['email'].errors['required']">Email is required</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Phone</label>
-              <input type="text" class="form-control" name="phone" formControlName="phone" />
+              <input type="text" class="form-control" formControlName="phone"
+                [ngClass]="{ 'is-invalid': submitted && f['phone'].errors }" />
+
+              <div *ngIf="submitted && f['phone'].errors" class="invalid-feedback">
+                <div *ngIf="f['phone'].errors['required']">Phone is required</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">Password</label>
-              <input type="text" class="form-control" name="phone" type="password" formControlName="password" />
+              <input type="password" class="form-control" formControlName="password"
+                [ngClass]="{ 'is-invalid': submitted && f['password'].errors }" />
+
+              <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+                <div *ngIf="f['password'].errors['required']">Password is required</div>
+              </div>
             </div>
             <div class="form-group">
               <label class="form-label">DOB</label>
-              <input type="date" class="form-control" name="dob" formControlName="dob" />
+              <input type="date" class="form-control" formControlName="dob"
+                [ngClass]="{ 'is-invalid': submitted && f['dob'].errors }" />
+
+              <div *ngIf="submitted && f['dob'].errors" class="invalid-feedback">
+                <div *ngIf="f['dob'].errors['required']">DOB is required</div>
+              </div>
             </div>
             <div class="form-group mb-4">
               <label class="form-label">Address</label>
-              <input type="text" class="form-control" name="address" formControlName="address" />
+              <input type="text" class="form-control" formControlName="address"
+                [ngClass]="{ 'is-invalid': submitted && f['address'].errors }" />
+
+              <div *ngIf="submitted && f['address'].errors" class="invalid-feedback">
+                <div *ngIf="f['address'].errors['required']">Address is required</div>
+              </div>
             </div>
             <span *ngIf="!isReg" class="text-danger">{{errorMsg}}</span>
             <div class="d-grid">
@@ -45,6 +86,21 @@
           </form>
         </c-card-body>
       </c-card>
+
+      <c-card-group *ngIf="isReg">
+        <c-card class="p-4">
+          <p>{{successMsg}}</p>
+          <c-card-body>
+            <h3 class="text-center">{{profile.userName | uppercase}}</h3>
+            <p>First Name: {{profile.firstName}}</p>
+            <p>Last Name: {{profile.lastName}}</p>
+            <p>Email: {{profile.email}}</p>
+            <p>Phone: {{profile.phone}}</p>
+            <p>DOB: {{profile.dob}}</p>
+            <p>Address: {{profile.address}}</p>
+          </c-card-body>
+        </c-card>
+      </c-card-group>
     </c-col>
   </c-row>
 </c-container>

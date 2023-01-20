@@ -1,48 +1,76 @@
+<c-container>
+  <c-row class="justify-content-center">
+    <c-col lg="7" md="9" xl="6">
+      <c-card class="mx-4">
+        <c-card-body class="p-4">
+          <form cForm [formGroup]="updateForm">
+            <h1>Profile</h1>
 
-    <c-container>
-      <c-row class="justify-content-center">
-        <c-col lg="7" md="9" xl="6">
-          <c-card class="mx-4">
-            <c-card-body class="p-4">
-              <form cForm [formGroup]="updateForm">
-                <h1>Profile</h1>
-  
-                <div class="form-group">
-                  <!-- <label class="form-label" >User Name</label> -->
-                  <input type="text" class="form-control" name="userName" formControlName="userName" hidden/>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" >First Name</label>
-                  <input type="text" class="form-control" name="firstName" formControlName="firstName"/>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" >Last Name</label>
-                  <input type="text" class="form-control" name="lastName" formControlName="lastName"/>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" >Email</label>
-                  <input type="text" class="form-control" name="email" formControlName="email"/>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" >Phone</label>
-                  <input type="text" class="form-control"  name="phone" formControlName="phone"/>
-                </div>
-                <div class="form-group">
-                  <label class="form-label" >DOB</label>
-                  <input type="date" class="form-control" name="dob" formControlName="dob"/>
-                </div>
-                <div class="form-group mb-4">
-                  <label class="form-label" >Address</label>
-                  <input type="text" class="form-control" name="address" formControlName="address"/>
-                </div>
-                
-                <div class="d-grid">
-                  <button cButton color="success"  (click)="updateUser()">Update</button>
-                </div>
-              </form>
-            </c-card-body>
-          </c-card>
-        </c-col>
-      </c-row>
-    </c-container>
-  
+            <div class="form-group">
+              <!-- <label class="form-label" >User Name</label> -->
+              <input type="text" class="form-control" name="userName" formControlName="userName" hidden />
+            </div>
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" name="firstName" formControlName="firstName"
+                [ngClass]="{ 'is-invalid': submitted && f['firstName'].errors }" />
+
+              <div *ngIf="submitted && f['firstName'].errors" class="invalid-feedback">
+                <div *ngIf="f['firstName'].errors['required']">First Name is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" name="lastName" formControlName="lastName"
+                [ngClass]="{ 'is-invalid': submitted && f['lastName'].errors }" />
+
+              <div *ngIf="submitted && f['lastName'].errors" class="invalid-feedback">
+                <div *ngIf="f['lastName'].errors['required']">Last Name is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="text" class="form-control" name="email" formControlName="email"
+                [ngClass]="{ 'is-invalid': submitted && f['email'].errors }" />
+
+              <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+                <div *ngIf="f['email'].errors['required']">Email is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input type="text" class="form-control" name="phone" formControlName="phone"
+                [ngClass]="{ 'is-invalid': submitted && f['phone'].errors }" />
+
+              <div *ngIf="submitted && f['phone'].errors" class="invalid-feedback">
+                <div *ngIf="f['phone'].errors['required']">Phone is required</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">DOB</label>
+              <input type="date" class="form-control" name="dob" formControlName="dob"
+                [ngClass]="{ 'is-invalid': submitted && f['dob'].errors }" />
+
+              <div *ngIf="submitted && f['dob'].errors" class="invalid-feedback">
+                <div *ngIf="f['dob'].errors['required']">DOB is required</div>
+              </div>
+            </div>
+            <div class="form-group mb-4">
+              <label class="form-label">Address</label>
+              <input type="text" class="form-control" name="address" formControlName="address"
+                [ngClass]="{ 'is-invalid': submitted && f['address'].errors }" />
+
+              <div *ngIf="submitted && f['address'].errors" class="invalid-feedback">
+                <div *ngIf="f['address'].errors['required']">Address is required</div>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button cButton color="success" (click)="updateUser()">Update</button>
+            </div>
+          </form>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+</c-container>

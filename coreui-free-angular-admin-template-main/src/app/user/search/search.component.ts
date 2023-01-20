@@ -29,7 +29,10 @@ export class SearchComponent implements OnInit {
 
   ngOnInit(): void {
     this.userName=this.authService.getUser().userName;
+    this.isSuccess=false;
+    this.isError=false;
     this.onCreateForm();
+
   }
 
   private onCreateForm = (): void => {
@@ -55,10 +58,9 @@ export class SearchComponent implements OnInit {
         console.log(data)
         this.listUser=data;
         if(this.listUser==null){
-          this.isSuccess=false;
-          this.isError = true;
-          this.errorMsg = "Not found";
-          return;
+          //this.isSuccess=true;
+          //this.isError = true;
+          this.errorMsg = "no result found";
         }
         this.isSuccess=true;
       },

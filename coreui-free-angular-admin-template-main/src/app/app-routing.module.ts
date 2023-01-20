@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { DefaultLayoutComponent } from './containers';
 import { AuthGuard } from './services/auth.guard';
+import { ChangePasswordComponent } from './user/change-password/change-password.component';
 import { ForgotPswComponent } from './views/pages/forgot-psw/forgot-psw.component';
 import { LoginComponent } from './views/pages/login/login.component';
 import { RegisterComponent } from './views/pages/register/register.component';
@@ -38,14 +39,14 @@ const routes: Routes = [
       {
         path: 'user',
         loadChildren: () =>
-          import('./user/user.module').then((m) => m.UserModule),
-          canActivate: [AuthGuard]
+          import('./user/user.module').then((m) => m.UserModule)
       },
       {
         path: 'pages',
         loadChildren: () =>
           import('./views/pages/pages.module').then((m) => m.PagesModule)
       },
+      
     ]
   },
   {
@@ -76,6 +77,13 @@ const routes: Routes = [
       title: 'Forgot Password'
     }
   },
+  {
+    path: 'change-password',
+    component: ChangePasswordComponent,
+    data: {
+      title: 'Change Password'
+    }
+  }, 
   {path: '**', redirectTo: 'login'}
 
   

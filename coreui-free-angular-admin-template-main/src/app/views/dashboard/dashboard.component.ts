@@ -39,7 +39,7 @@ export class DashboardComponent implements OnInit {
     this.userService.loadProfile(this.userName).subscribe(
       data => {
         console.log("success");
-        console.log(data)
+        //console.log(data)
         this.profile=data
       },
       err => {

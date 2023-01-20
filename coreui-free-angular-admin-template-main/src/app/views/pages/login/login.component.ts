@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
@@ -15,10 +15,11 @@ export class LoginComponent implements OnInit {
     userName: null,
     password: null
   };
-  errorMsg=''
-  islogin=true;
+  errorMsg = ''
+  islogin = true;
 
   public loginForm!: FormGroup;
+  submitted = false;
 
   constructor(
     private router: Router,
@@ -30,38 +31,50 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.onCreateForm();
   }
-
-  // login() {
-  //   console.log(this.loginForm.value)
-  //   this.authService.login("", "").subscribe((data) => {
-  //     // If valid and route to card
-  //     if (data) {
-  //       this.router.navigate(['/dashboard']);  // If valid and route to card
-  //     }
-  //     //this.isSubmitted = true;
-  //     // this.isValidUser = data; // false show error message
-  //   });
-  // };
-
   login() {
-    console.log(this.loginForm.value)
+    //console.log(this.loginForm.value)
+    this.submitted = true;
+    if (this.loginForm.invalid) {
+      return;
+    }
     this.userService.signin(this.loginForm.value).subscribe(
       data => {
-        this.islogin=true;
+        this.islogin = true;
         console.log("success");
-        this.authService.login(this.loginForm.value);
+        this.authService.login(this.loginForm.value, data.message);
+        this.loadUser(this.loginForm.value.userName);
         this.router.navigate(['/dashboard']);
-        console.log(data)
+       // console.log(data)
       },
       err => {
-        this.islogin=false;
+        this.islogin = false;
         console.log("error");
         console.log(err.error)
-        this.errorMsg=err.error.message;
-       
+        this.errorMsg = err.error.message;
+
       }
     );
   };
+  private loadUser(userName: any) {
+    this.userService.getUser(userName).subscribe(
+      data => {
+        console.log("success");
+        //console.log(data)
+        if(data.roleId!=null && data.roleId==1){
+          this.authService.role="admin";
+        }
+        
+        
+      },
+      err => {
+        
+        
+        console.log("error");
+        console.log(err.error)
+       
+      }
+    );
+  }
 
   private onCreateForm = (): void => {
     this.loginForm = this.fb.group({
@@ -69,4 +82,7 @@ export class LoginComponent implements OnInit {
       password: [null, [Validators.required]],
     });
   };
+  get f(): { [key: string]: AbstractControl } {
+    return this.loginForm.controls;
+  }
 }
