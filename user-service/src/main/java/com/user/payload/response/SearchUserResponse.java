@@ -7,6 +7,10 @@ public class SearchUserResponse {
 	private String lastName;
 	private String address;
 
+	public SearchUserResponse() {
+		super();
+	}
+
 	public SearchUserResponse(String userName, String firstName, String lastName, String address) {
 		super();
 		this.userName = userName;

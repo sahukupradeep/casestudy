@@ -81,8 +81,8 @@ public class UserService {
 		} catch (Exception e) {
 
 			logger.error("registerUser() : Exception occured, message={}", e.getMessage(), e);
-			this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, e.getLocalizedMessage());
-			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
+			this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, e.getMessage());
+			return ResponseEntity.internalServerError().body(new MessageResponse(e.getMessage()));
 		}
 
 	}
