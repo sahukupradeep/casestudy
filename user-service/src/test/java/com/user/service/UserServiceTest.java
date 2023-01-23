@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.user.constant.AppConstant;
 import com.user.entity.User;
 import com.user.payload.request.SignReq;
 import com.user.payload.request.TempPswRequest;
@@ -60,6 +61,8 @@ class UserServiceTest {
 
 		user.setUserName("username");
 
+		when(encryptDecryptUtilMock.encrypt("username")).thenReturn("username");
+
 		when(userRepositoryMock.existsByUserName(user.getUserName())).thenReturn(true);
 
 		Assertions.assertEquals(response.getStatusCodeValue(), userService.registerUser(user).getStatusCodeValue());
@@ -73,6 +76,9 @@ class UserServiceTest {
 		User user = new User();
 		user.setUserName("username");
 		user.setEmail("email@gmail.com");
+
+		when(encryptDecryptUtilMock.encrypt("username")).thenReturn("username");
+		when(encryptDecryptUtilMock.encrypt("email@gmail.com")).thenReturn("email@gmail.com");
 
 		when(userRepositoryMock.existsByUserName(user.getUserName())).thenReturn(false);
 
@@ -90,6 +96,9 @@ class UserServiceTest {
 		user.setEmail("email@gmail.com");
 		user.setPhone("9087654321");
 
+		when(encryptDecryptUtilMock.encrypt("username")).thenReturn("username");
+		when(encryptDecryptUtilMock.encrypt("email@gmail.com")).thenReturn("email@gmail.com");
+		when(encryptDecryptUtilMock.encrypt("9087654321")).thenReturn("9087654321");
 		when(userRepositoryMock.existsByUserName(user.getUserName())).thenReturn(false);
 
 		when(userRepositoryMock.existsByEmail(user.getEmail())).thenReturn(false);
@@ -111,26 +120,6 @@ class UserServiceTest {
 		user.setLastName("Sahu");
 		user.setEmail("email@gmail.com");
 		user.setPhone("9087654321");
-
-		when(userRepositoryMock.existsByUserName(user.getUserName())).thenReturn(false);
-
-		when(userRepositoryMock.existsByEmail(user.getEmail())).thenReturn(false);
-
-		when(userRepositoryMock.existsByPhone(user.getPhone())).thenReturn(false);
-
-		when(encryptDecryptUtilMock.encrypt("123")).thenReturn("123");
-
-		when(userRepositoryMock.save(user)).thenReturn(user);
-
-		Assertions.assertEquals(response.getStatusCodeValue(), userService.registerUser(user).getStatusCodeValue());
-	}
-	
-	@Test
-	void testRegisterUserException() {
-		ResponseEntity<MessageResponse> response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(new MessageResponse());
-		User user = new User();
-		user.setUserName("username");
 
 		when(userRepositoryMock.existsByUserName(user.getUserName())).thenReturn(false);
 
@@ -169,6 +158,31 @@ class UserServiceTest {
 
 		Assertions.assertEquals(response.getStatusCodeValue(), userService.signin(req).getStatusCodeValue());
 
+	}
+	
+	@Test
+	void testSigninTemp() {
+		ResponseEntity<MessageResponse> response = ResponseEntity.status(HttpStatus.OK).body(new MessageResponse());
+		User user = new User();
+		user.setId(1L);
+		user.setUserName("username");
+		user.setPassword("6565655");
+		user.setFirstName("pradeep");
+		user.setLastName("Sahu");
+		user.setEmail("email@gmail.com");
+		user.setPhone("9087654321");
+		user.setPswType(AppConstant.TEMP_PSW);
+
+		SignReq req = new SignReq();
+		req.setPassword("6565655");
+		req.setUserName("username");
+
+		Optional<User> optional = Optional.of(user);
+
+		when(encryptDecryptUtilMock.encrypt("6565655")).thenReturn("6565655");
+		when(userRepositoryMock.findByUserNameAndPassword(user.getUserName(), user.getPassword())).thenReturn(optional);
+
+		Assertions.assertEquals(response.getStatusCodeValue(), userService.signin(req).getStatusCodeValue());
 	}
 
 	@Test

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NavigationExtras, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
+import { saveAs} from 'file-saver';
+import * as fileSaver from 'file-saver';
 
 @Component({
   selector: 'app-search',
@@ -87,4 +89,17 @@ export class SearchComponent implements OnInit {
     };
     this.router.navigate(["/user/details"], navigationExtras);
   }
+
+  selectedFiles?: FileList;
+  currentFile?: File;
+
+  downloadAudit(userName:any){
+    console.log(userName);
+
+    this.userService.downloadAudit(userName)
+      .subscribe(blob => fileSaver.saveAs(blob, userName+'.xlsx'));
+  }
+  
 }
+
+

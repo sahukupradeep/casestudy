@@ -1,7 +1,6 @@
 package com.user.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,26 +22,35 @@ public class AuditService {
 	@Autowired
 	private AuditRepository auditRepository;
 
+	@Autowired
+	private ExcelUtils excelUtils;
+
 	public Audit addAudit(Audit audit) {
 
 		logger.info("Add audit");
 
-		audit.setCreatedDate(LocalDateTime.now());
+		try {
+			audit.setCreatedDate(LocalDateTime.now());
 
-		Audit result = auditRepository.save(audit);
-		return result;
+			Audit result = auditRepository.save(audit);
+			return result;
+		} catch (Exception e) {
+			logger.error("addAudit() Failed isertion");
+			return audit;
+		}
+
 	}
 
 	public InputStream loadFile(String userName) {
 
 		logger.info("loadFile " + userName);
 
-		List<Audit> audits = auditRepository.findByUserName(userName);
-
 		try {
-			ByteArrayInputStream in = ExcelUtils.auditsToExcel(audits);
+			List<Audit> audits = auditRepository.findByUserName(userName);
+			ByteArrayInputStream in = excelUtils.auditsToExcel(audits);
 			return in;
-		} catch (IOException e) {
+		} catch (Exception e) {
+			logger.error(" ");
 		}
 
 		return null;
@@ -51,19 +59,29 @@ public class AuditService {
 	public List<Audit> getByUserName(String userName) {
 
 		logger.info("get audit " + userName);
+		try {
+			List<Audit> audits = auditRepository.findByUserName(userName);
+			return audits;
+		} catch (Exception e) {
+			return null;
+		}
 
-		List<Audit> audits = auditRepository.findByUserName(userName);
-		return audits;
 	}
 
-	public void addAudit(String userName, String activity, String msg) {
-		Audit audit = new Audit();
-		audit.setActivity(activity);
-		audit.setMessage(msg);
-		audit.setUserName(userName);
-		audit.setCreatedDate(LocalDateTime.now());
-		
-		auditRepository.save(audit);
+	public Audit addAudit(String userName, String activity, String msg) {
+		try {
+			Audit audit = new Audit();
+			audit.setActivity(activity);
+			audit.setMessage(msg);
+			audit.setUserName(userName);
+			audit.setCreatedDate(LocalDateTime.now());
+
+			Audit result=auditRepository.save(audit);
+			return result;
+		} catch (Exception e) {
+			return null;
+		}
+
 	}
 
 }

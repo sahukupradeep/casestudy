@@ -45,6 +45,11 @@ public class UserService {
 
 		logger.info("register user");
 		try {
+			user.setEmail(encryptDecryptUtil.encrypt(user.getEmail()));
+			user.setPassword(encryptDecryptUtil.encrypt(user.getPassword()));
+			user.setPhone(encryptDecryptUtil.encrypt(user.getPhone()));
+			user.setDob(encryptDecryptUtil.encrypt(user.getDob()));
+
 			if (userRepository.existsByUserName(user.getUserName())) {
 				logger.error("Error: Username is already exist!");
 				this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, "Error: Username is already exist!");
@@ -62,11 +67,6 @@ public class UserService {
 				this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, "Error: Phone is already exist!");
 				return ResponseEntity.badRequest().body(new MessageResponse("Error: Phone is already exist!"));
 			}
-
-			user.setEmail(encryptDecryptUtil.encrypt(user.getEmail()));
-			user.setPassword(encryptDecryptUtil.encrypt(user.getPassword()));
-			user.setPhone(encryptDecryptUtil.encrypt(user.getPhone()));
-			user.setDob(encryptDecryptUtil.encrypt(user.getDob()));
 
 			user.setCreatedDate(LocalDateTime.now());
 			user.setStatus(AppConstant.STATUS_ACTIVE);
@@ -256,16 +256,16 @@ public class UserService {
 			List<SearchUserResponse> users = userRepository.search(userName, firstName, lastName,
 					encryptDecryptUtil.encrypt(dob));
 			this.runAudit("admin", AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
-			if(users==null || users.isEmpty()) {
+			if (users == null || users.isEmpty()) {
 				return null;
 			}
 			return users;
-		}catch (Exception e) {
+		} catch (Exception e) {
 			logger.error("search() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit("admin", AppConstant.FATCH_ACT, e.getLocalizedMessage());
 			return null;
 		}
-		
+
 	}
 
 	public ResponseEntity<MessageResponse> sendTempPsw(TempPswRequest userReq) {

@@ -13,7 +13,12 @@ import { navItems } from './_nav';
 export class DefaultLayoutComponent implements OnInit {
 
 
+
+
   role:any=null;
+
+  constructor(private authService: AuthService) { }
+  
   ngOnInit(): void {
     this.role=this.authService.role;
     console.log(this.role)
@@ -26,5 +31,5 @@ export class DefaultLayoutComponent implements OnInit {
     suppressScrollX: true,
   };
 
-  constructor(private authService: AuthService) { }
+  
 }

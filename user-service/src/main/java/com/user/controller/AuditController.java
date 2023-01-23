@@ -9,6 +9,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +21,7 @@ import com.user.entity.Audit;
 import com.user.payload.response.MessageResponse;
 import com.user.service.AuditService;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/audit/")
 public class AuditController {
@@ -57,12 +59,13 @@ public class AuditController {
 		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(auditService.loadFile(userName)));
 
 	}
+
 	@GetMapping("get/userName")
 	public ResponseEntity<List<Audit>> getByUserName(@RequestParam String userName) {
 
 		logger.info("get audit " + userName);
-		
-		List<Audit> audits=auditService.getByUserName(userName);
+
+		List<Audit> audits = auditService.getByUserName(userName);
 
 		return ResponseEntity.ok().body(audits);
 	}

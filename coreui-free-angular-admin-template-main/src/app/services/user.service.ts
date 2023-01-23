@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 
 const API_URL = 'http://localhost:8081/api/user/';
+const AUDIT_API_URL = 'http://localhost:8081/api/audit/';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  
 
   constructor(private http: HttpClient) { }
 
@@ -54,6 +56,13 @@ export class UserService {
 
   sendTempPsw(value: any) {
     return this.http.put(API_URL + 'send/temp/psw', value, { responseType: 'json' });
+  }
+
+
+  downloadAudit(userName: any) {
+    return this.http.get(AUDIT_API_URL+"download?userName="+userName, {              
+      responseType: 'blob'
+    });
   }
 
 }

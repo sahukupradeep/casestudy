@@ -41,9 +41,10 @@ export class LoginComponent implements OnInit {
       data => {
         this.islogin = true;
         console.log("success");
+        // 
         this.authService.login(this.loginForm.value, data.message);
         this.loadUser(this.loginForm.value.userName);
-        this.router.navigate(['/dashboard']);
+        // this.router.navigate(['/dashboard']);
        // console.log(data)
       },
       err => {
@@ -55,26 +56,31 @@ export class LoginComponent implements OnInit {
       }
     );
   };
+
   private loadUser(userName: any) {
-    this.userService.getUser(userName).subscribe(
-      data => {
-        console.log("success");
-        //console.log(data)
-        if(data.roleId!=null && data.roleId==1){
+    console.log({userName});
+    this.userService.getUser(userName).subscribe(data => {
+        console.log("success "+data?.roleId);
+        console.log(data)
+        if(data?.roleId!=null && data?.roleId==1){
           this.authService.role="admin";
+        } else{
+          this.authService.role=null; 
         }
-        
-        
+
+        // Go to dashboard
+        this.gotoDashboard();
       },
       err => {
-        
-        
         console.log("error");
-        console.log(err.error)
-       
+        console.log(err.error);
       }
     );
   }
+
+  private gotoDashboard = () => {
+    this.router.navigate(['/dashboard']);
+  };
 
   private onCreateForm = (): void => {
     this.loginForm = this.fb.group({
@@ -82,6 +88,7 @@ export class LoginComponent implements OnInit {
       password: [null, [Validators.required]],
     });
   };
+
   get f(): { [key: string]: AbstractControl } {
     return this.loginForm.controls;
   }

@@ -14,12 +14,14 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
 
 import com.user.entity.Audit;
 
+@Component
 public class ExcelUtils {
 
-	public static ByteArrayInputStream auditsToExcel(List<Audit> audits) throws IOException {
+	public ByteArrayInputStream auditsToExcel(List<Audit> audits) throws IOException {
 		String[] COLUMNs = { "Id", "UserName", "Activity", "Message" };
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			CreationHelper createHelper = workbook.getCreationHelper();

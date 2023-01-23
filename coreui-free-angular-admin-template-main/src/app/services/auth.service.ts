@@ -22,6 +22,7 @@ export class AuthService {
 
   login(user:any,data:any): Observable<boolean> {
       this.isAuthenticate = true;
+      user.password=null;
       if(data=="TEMP"){
         this.isTemp=true;
       }else{
