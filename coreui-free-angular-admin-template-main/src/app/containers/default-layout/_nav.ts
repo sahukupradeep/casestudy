@@ -1,6 +1,6 @@
 import { INavData } from '@coreui/angular';
 
-export const navItems: INavData[] = [
+export const navAdminItems: INavData[] = [
   {
     name: 'Dashboard',
     url: '/dashboard',
@@ -19,5 +19,13 @@ export const navItems: INavData[] = [
         url: '/user/add'
       }
     ]
+  }
+];
+
+export const navUserItems: INavData[] = [
+  {
+    name: 'Dashboard',
+    url: '/dashboard',
+    iconComponent: { name: 'cil-speedometer' }
   }
 ];

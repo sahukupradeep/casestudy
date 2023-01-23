@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { UserService } from 'src/app/services/user.service';
 
-import { navItems } from './_nav';
+import { navAdminItems,navUserItems } from './_nav';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,18 +14,20 @@ export class DefaultLayoutComponent implements OnInit {
 
 
 
-
+  public navItems:any;
   role:any=null;
 
   constructor(private authService: AuthService) { }
-  
+
   ngOnInit(): void {
     this.role=this.authService.role;
     console.log(this.role)
+    if(this.role!=null){
+      this.navItems=navAdminItems;
+    }else{
+      this.navItems=navUserItems;
+    }
   }
-
-
-  public navItems = navItems;
 
   public perfectScrollbarConfig = {
     suppressScrollX: true,
