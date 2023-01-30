@@ -51,6 +51,7 @@ import { ViewComponent } from './views/user/view/view.component';
 import { UserService } from './services/user.service';
 import { HttpClientModule } from '@angular/common/http';
 
+
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
 };

@@ -69,4 +69,31 @@ public class AuditController {
 
 		return ResponseEntity.ok().body(audits);
 	}
+
+	@GetMapping("search")
+	public ResponseEntity<InputStreamResource> searchDownload(@RequestParam(required = false) String userName,
+			@RequestParam(required = false) String firstName, @RequestParam(required = false) String lastName,@RequestParam(required = false) String auditDate) {
+
+
+		logger.info(firstName+" searchDownload audit " + userName+ "  "+lastName);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition", "attachment; filename=Audit.xlsx");
+
+		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(auditService.searchDownload(userName,firstName,lastName,auditDate)));
+	}
+	
+	@GetMapping("v1/search")
+	public ResponseEntity<InputStreamResource> searchDownloadV1(@RequestParam(required = false) String userName,
+			@RequestParam(required = false) String firstName, @RequestParam(required = false) String lastName,@RequestParam(required = false) String fromDate,@RequestParam(required = false) String toDate) {
+
+
+		logger.info(firstName+" searchDownloadV1 audit " + userName+ "  "+lastName);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition", "attachment; filename=Audit.xlsx");
+
+		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(auditService.searchDownloadV1(userName,firstName,lastName,fromDate,toDate)));
+	}
+
 }

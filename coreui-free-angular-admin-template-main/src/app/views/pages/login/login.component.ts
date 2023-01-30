@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
     console.log({userName});
     this.userService.getUser(userName).subscribe(data => {
         console.log("success "+data?.roleId);
-        console.log(data)
+        // console.log(data)
         if(data?.roleId!=null && data?.roleId==1){
           this.authService.role="admin";
         } else{

@@ -1,5 +1,7 @@
 package com.user.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.user.entity.User;
+import com.user.payload.request.RoleStatusReq;
 import com.user.payload.request.SignReq;
 import com.user.payload.request.TempPswRequest;
 import com.user.payload.request.UpdatePswReq;
@@ -93,7 +96,27 @@ public class UserController {
 
 		logger.info("get user by userName");
 
-		List<SearchUserResponse> users = userService.search(userName,firstName,lastName,dob);
+		List<SearchUserResponse> users = userService.search(userName, firstName, lastName, dob);
+
+		return ResponseEntity.ok(users);
+	}
+
+	@GetMapping("v1/search")
+	public ResponseEntity<List<SearchUserResponse>> search1(@RequestParam(required = false) String userName,
+			@RequestParam(required = false) String firstName, @RequestParam(required = false) String lastName,
+			@RequestParam(required = false) String dob, @RequestParam(required = false) String searchDate) {
+
+		logger.info("get user by userName");
+
+		LocalDateTime createdDate=null;
+		if(searchDate!=null && searchDate.trim()!="") {
+			LocalDate localDate = LocalDate.parse(searchDate);
+
+			createdDate = localDate.atStartOfDay();
+
+		}
+		
+		List<SearchUserResponse> users = userService.search1(userName, firstName, lastName, dob, createdDate);
 
 		return ResponseEntity.ok(users);
 	}
@@ -107,13 +130,23 @@ public class UserController {
 
 		return ResponseEntity.ok(user);
 	}
-	
+
 	@PutMapping("send/temp/psw")
 	public ResponseEntity<MessageResponse> sendTempPsw(@RequestBody TempPswRequest user) {
 
 		logger.info("send temp password");
 
 		ResponseEntity<MessageResponse> response = userService.sendTempPsw(user);
+
+		return response;
+	}
+
+	@PutMapping("update/role/status")
+	public ResponseEntity<MessageResponse> updateRoleStatus(@RequestBody RoleStatusReq user) {
+
+		logger.info("update user role and status");
+
+		ResponseEntity<MessageResponse> response = userService.updateRoleStatus(user);
 
 		return response;
 	}

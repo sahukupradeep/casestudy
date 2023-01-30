@@ -57,6 +57,8 @@ public class User {
 
 	private LocalDateTime updatedDate;
 
+	private LocalDateTime loginDate;
+
 	public Long getId() {
 		return id;
 	}
@@ -167,6 +169,14 @@ public class User {
 
 	public void setUpdatedDate(LocalDateTime updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public LocalDateTime getLoginDate() {
+		return loginDate;
+	}
+
+	public void setLoginDate(LocalDateTime loginDate) {
+		this.loginDate = loginDate;
 	}
 
 }

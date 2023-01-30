@@ -19,6 +19,11 @@ export const navAdminItems: INavData[] = [
         url: '/user/add'
       }
     ]
+  },
+  {
+    name: 'Report',
+    url: '/report',
+    iconComponent: { name: 'cil-star' }
   }
 ];
 

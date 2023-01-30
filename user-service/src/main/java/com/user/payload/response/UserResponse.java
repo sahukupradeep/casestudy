@@ -18,11 +18,30 @@ public class UserResponse {
 
 	private String address;
 
+	private Integer status;
+
+	private Integer roleId;
+
 	public UserResponse() {
 		super();
 	}
 
-	public UserResponse(String userName, String firstName,String lastName,String address) {
+	public UserResponse(Long id, String userName, String firstName, String lastName, String email, String phone,
+			String dob, String address, Integer status, Integer roleId) {
+		super();
+		this.id = id;
+		this.userName = userName;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.phone = phone;
+		this.dob = dob;
+		this.address = address;
+		this.status = status;
+		this.roleId = roleId;
+	}
+
+	public UserResponse(String userName, String firstName, String lastName, String address) {
 		super();
 		this.userName = userName;
 		this.firstName = firstName;
@@ -92,6 +111,22 @@ public class UserResponse {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Integer getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(Integer roleId) {
+		this.roleId = roleId;
 	}
 
 }

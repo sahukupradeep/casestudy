@@ -8,12 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.user.constant.AppConstant;
 import com.user.entity.User;
+import com.user.payload.request.RoleStatusReq;
 import com.user.payload.request.SignReq;
 import com.user.payload.request.TempPswRequest;
 import com.user.payload.request.UpdatePswReq;
@@ -40,12 +42,16 @@ public class UserService {
 
 	@Autowired
 	private AuditService auditService;
+	
+	@Value("${scheduler.userUpdateDays}")
+	private Integer userUpdateDays;
 
 	public ResponseEntity<MessageResponse> registerUser(User user) {
 
 		logger.info("register user");
 		try {
 			user.setEmail(encryptDecryptUtil.encrypt(user.getEmail()));
+
 			user.setPassword(encryptDecryptUtil.encrypt(user.getPassword()));
 			user.setPhone(encryptDecryptUtil.encrypt(user.getPhone()));
 			user.setDob(encryptDecryptUtil.encrypt(user.getDob()));
@@ -93,18 +99,20 @@ public class UserService {
 		try {
 			String password = encryptDecryptUtil.encrypt(user.getPassword());
 
-			Optional<User> optional = userRepository.findByUserNameAndPassword(user.getUserName(), password);
+			Optional<User> optional = userRepository.findByUserNameAndPasswordActive(user.getUserName(), password);
 
 			if (optional.isPresent()) {
 				logger.info("User login successfullY!");
+				optional.get().setLoginDate(LocalDateTime.now());
+				userRepository.save(optional.get());
 				this.runAudit(user.getUserName(), AppConstant.LOGIN_ACT, AppConstant.SUCCESS_MSG);
 				return ResponseEntity
 						.ok(new MessageResponse(optional.get().getPswType() == AppConstant.TEMP_PSW ? "TEMP" : ""));
 			}
-			logger.warn("Invalid username and password");
-			this.runAudit(user.getUserName(), AppConstant.LOGIN_ACT, "Invalid username and password");
+			logger.warn("Invalid username or password");
+			this.runAudit(user.getUserName(), AppConstant.LOGIN_ACT, "Invalid username or password");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new MessageResponse("Invalid username and password"));
+					.body(new MessageResponse("Invalid username or password"));
 		} catch (Exception e) {
 
 			logger.error("signin() : Exception occured, message={}", e.getMessage(), e);
@@ -179,7 +187,7 @@ public class UserService {
 
 			userRepository.save(user);
 			logger.info("User update successfully!");
-			this.runAudit(user.getUserName(), AppConstant.UPDATE_ACT, AppConstant.UPDATE_ACT);
+			this.runAudit(user.getUserName(), AppConstant.UPDATE_ACT, AppConstant.SUCCESS_MSG);
 			return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("User update successfullY!"));
 		} catch (Exception e) {
 			logger.error("updateProfile() : Exception occured, message={}", e.getMessage(), e);
@@ -189,6 +197,7 @@ public class UserService {
 	}
 
 	public User getByUserName(String userName) {
+		logger.info("Get User");
 
 		try {
 			Optional<User> optional = userRepository.findByUserName(userName);
@@ -205,20 +214,22 @@ public class UserService {
 				user.setEmail(mail);
 				user.setPhone(phone);
 				user.setDob(dob);
-				this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
+//				this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
 				return user;
 			}
 			this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.FAIL_MSG);
 			return null;
 		} catch (Exception e) {
 			logger.error("getByUserName() : Exception occured, message={}", e.getMessage(), e);
-			this.runAudit(userName, AppConstant.FATCH_ACT, e.getLocalizedMessage());
+//			this.runAudit(userName, AppConstant.FATCH_ACT, e.getLocalizedMessage());
 			return null;
 		}
 
 	}
 
 	public UserResponse getProfileByUserName(String userName) {
+
+		logger.info("Get profile");
 
 		try {
 			Optional<User> optional = userRepository.findByUserName(userName);
@@ -237,14 +248,14 @@ public class UserService {
 				UserResponse userResponse = new UserResponse();
 				BeanUtils.copyProperties(user, userResponse);
 
-				this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
+//				this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
 				return userResponse;
 			}
-			this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.FAIL_MSG);
+//			this.runAudit(userName, AppConstant.FATCH_ACT, AppConstant.FAIL_MSG);
 			return null;
 		} catch (Exception e) {
 			logger.error("getProfileByUserName() : Exception occured, message={}", e.getMessage(), e);
-			this.runAudit(userName, AppConstant.FATCH_ACT, e.getLocalizedMessage());
+//			this.runAudit(userName, AppConstant.FATCH_ACT, e.getLocalizedMessage());
 			return null;
 		}
 
@@ -255,14 +266,14 @@ public class UserService {
 		try {
 			List<SearchUserResponse> users = userRepository.search(userName, firstName, lastName,
 					encryptDecryptUtil.encrypt(dob));
-			this.runAudit("admin", AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
+//			this.runAudit("admin", AppConstant.FATCH_ACT, AppConstant.SUCCESS_MSG);
 			if (users == null || users.isEmpty()) {
 				return null;
 			}
 			return users;
 		} catch (Exception e) {
 			logger.error("search() : Exception occured, message={}", e.getMessage(), e);
-			this.runAudit("admin", AppConstant.FATCH_ACT, e.getLocalizedMessage());
+//			this.runAudit("admin", AppConstant.FATCH_ACT, e.getLocalizedMessage());
 			return null;
 		}
 
@@ -292,7 +303,7 @@ public class UserService {
 		} catch (Exception e) {
 			logger.error("sendTempPsw() : Exception occured, message={}", e.getMessage(), e);
 			this.runAudit(userReq.getUserName(), AppConstant.SEND_PSW_ACT, e.getLocalizedMessage());
-			return ResponseEntity.ok(new MessageResponse(e.getLocalizedMessage()));
+			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
 		}
 	}
 
@@ -302,6 +313,92 @@ public class UserService {
 			auditService.addAudit(userName, activity, msg);
 		});
 		auditThread.start();
+
+	}
+
+	public ResponseEntity<MessageResponse> updateRoleStatus(RoleStatusReq user) {
+		logger.info("change password ");
+
+		try {
+			Optional<User> optional = userRepository.findByUserName(user.getUserName());
+
+			if (optional.isEmpty()) {
+				logger.error("Error: User not found!");
+				this.runAudit(user.getUserName(), AppConstant.CHANGE_PSW_ACT, "Error: User not found!");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Error: User not found!"));
+			}
+
+			User existUser = optional.get();
+
+			if (user.getIsAdmin()) {
+				existUser.setRoleId(1);
+			}
+
+			if (user.getIsDisable()) {
+				existUser.setStatus(AppConstant.STATUS_DISABLE);
+			} else {
+				existUser.setStatus(AppConstant.STATUS_ACTIVE);
+			}
+
+			existUser.setUpdatedDate(LocalDateTime.now());
+
+			userRepository.save(existUser);
+
+			logger.info("Password changed successfully!");
+			this.runAudit(user.getUserName(), AppConstant.CHANGE_PSW_ACT, AppConstant.SUCCESS_MSG);
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(new MessageResponse("Password changed successfullY!"));
+		} catch (Exception e) {
+			logger.error("updateRoleStatus() : Exception occured, message={}", e.getMessage(), e);
+			this.runAudit(user.getUserName(), AppConstant.REGISTER_ACT, e.getLocalizedMessage());
+			return ResponseEntity.internalServerError().body(new MessageResponse(e.getLocalizedMessage()));
+		}
+	}
+
+	public List<SearchUserResponse> search1(String userName, String firstName, String lastName, String dob,
+			LocalDateTime creadtedDate) {
+
+		logger.info("V1 search");
+
+		try {
+			LocalDateTime endDate = null;
+			if (creadtedDate != null) {
+				endDate = creadtedDate.plusDays(1);
+			}
+
+			List<SearchUserResponse> users = userRepository.search1(userName, firstName, lastName,
+					encryptDecryptUtil.encrypt(dob), creadtedDate, endDate);
+			if (users == null || users.isEmpty()) {
+				return null;
+			}
+			return users;
+		}catch (Exception e) {
+			logger.error("search1() : Exception occured, message={}", e.getMessage(), e);
+			return null;
+		}
+		
+		
+	}
+
+	public void schedularUserUpate() {
+
+		logger.info("Scheduler User Update");
+
+		try {
+			LocalDateTime loginDate = LocalDateTime.now().minusDays(userUpdateDays);
+
+			List<User> list = userRepository.findAllWithLoginDateTimeBefore(loginDate);
+
+			list.stream().forEach(user -> {
+				user.setStatus(AppConstant.STATUS_DISABLE);
+				
+				logger.info("  ----  { }"+user);
+
+				userRepository.save(user);
+			});
+		} catch (Exception e) {
+			logger.error("updateRoleStatus() : Exception occured, message={}", e.getMessage(), e);
+		}
 
 	}
 

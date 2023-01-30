@@ -1,0 +1,42 @@
+<c-container>
+  <c-row class="justify-content-center">
+    <c-col lg="7" md="9" xl="6">
+      <c-card class="mx-4">
+        <c-card-body class="p-4">
+          <form cForm [formGroup]="searchForm">
+            <h1 class="text-center">Search Report</h1>
+
+            <div class="form-group">
+              <label class="form-label">User Name</label>
+              <input type="text" class="form-control" formControlName="userName" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" formControlName="firstName" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" formControlName="lastName" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Activity Date</label>
+              <div class="row ">
+
+                <div class="col"><label class="form-label">From</label><input type="date" class="form-control"
+                    formControlName="auditDate" /></div>
+                <div class="col"><label class="form-label">To</label><input type="date" class="form-control"
+                    formControlName="toDate" /></div>
+              </div>
+
+            </div>
+
+            <span *ngIf="isError" class="text-danger">{{errorMsg}}</span>
+            <div class="d-grid mt-3">
+              <button cButton color="success" (click)="search()">Search</button>
+            </div>
+          </form>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+</c-container>

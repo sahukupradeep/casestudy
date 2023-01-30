@@ -22,7 +22,8 @@ import com.user.entity.Audit;
 public class ExcelUtils {
 
 	public ByteArrayInputStream auditsToExcel(List<Audit> audits) throws IOException {
-		String[] COLUMNs = { "Id", "UserName", "Activity", "Message" };
+		String[] COLUMNs = { "User Name", "First Name", "Last Name","Activity", "Message" ,"Activity Date"};
+//		String[] COLUMNs = { "Activity", "Message" };
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			CreationHelper createHelper = workbook.getCreationHelper();
 
@@ -53,11 +54,12 @@ public class ExcelUtils {
 			for (Audit audit : audits) {
 				Row row = sheet.createRow(rowIdx++);
 
-				row.createCell(0).setCellValue(audit.getId());
-				row.createCell(1).setCellValue(audit.getUserName());
-				row.createCell(2).setCellValue(audit.getActivity());
-				row.createCell(3).setCellValue(audit.getMessage());
-				// row.createCell(4).setCellValue(audit.getCreatedDate());
+				row.createCell(0).setCellValue(audit.getUserName());
+				row.createCell(1).setCellValue(audit.getFirstName());
+				row.createCell(2).setCellValue(audit.getLastName());
+				row.createCell(3).setCellValue(audit.getActivity());
+				row.createCell(4).setCellValue(audit.getMessage());
+				row.createCell(5).setCellValue(audit.getCreatedDate().toString());
 
 				/*
 				 * Cell ageCell = row.createCell(4); ageCell.setCellValue(audit.getAge());
